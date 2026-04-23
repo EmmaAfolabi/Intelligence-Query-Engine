@@ -11,8 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +28,16 @@ public class DataSeeder {
     @Bean
     public CommandLineRunner seedDatabase() {
         return args -> {
-            File dataFile = new File("profiles.data");
-            if (!dataFile.exists()) {
-                log.warn("profiles.data file not found. Skipping data seeding.");
-                return;
-            }
-
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ProfileDataWrapper wrapper = objectMapper.readValue(dataFile, ProfileDataWrapper.class);
+                ClassPathResource resource = new ClassPathResource("profiles.data");
+                if (!resource.exists()) {
+                    log.warn("profiles.data file not found in classpath. Skipping data seeding.");
+                    return;
+                }
+
+                try (InputStream is = resource.getInputStream()) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    ProfileDataWrapper wrapper = objectMapper.readValue(is, ProfileDataWrapper.class);
                 if (wrapper != null && wrapper.getProfiles() != null) {
                     List<Profile> toSave = new ArrayList<>();
                     int skipped = 0;
@@ -66,6 +68,7 @@ public class DataSeeder {
                     } else {
                         log.info("Database is already fully seeded. Skipped {} existing profiles.", skipped);
                     }
+                }
                 }
             } catch (Exception e) {
                 log.error("Failed to seed database: {}", e.getMessage(), e);
