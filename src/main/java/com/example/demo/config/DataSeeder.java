@@ -23,7 +23,6 @@ import java.util.List;
 public class DataSeeder {
 
     private final ProfileRepository profileRepository;
-    private final ObjectMapper objectMapper;
 
     @Bean
     public CommandLineRunner seedDatabase() {
@@ -35,6 +34,7 @@ public class DataSeeder {
             }
 
             try {
+                ObjectMapper objectMapper = new ObjectMapper();
                 ProfileDataWrapper wrapper = objectMapper.readValue(dataFile, ProfileDataWrapper.class);
                 if (wrapper != null && wrapper.getProfiles() != null) {
                     List<Profile> toSave = new ArrayList<>();
