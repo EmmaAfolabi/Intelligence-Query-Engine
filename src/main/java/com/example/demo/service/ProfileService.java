@@ -57,10 +57,16 @@ public class ProfileService {
             maxAge = 24;
             understood = true;
         }
-        if (lowerQ.contains("female") || lowerQ.contains("females")) {
+        boolean hasFemale = lowerQ.contains("female") || lowerQ.contains("females") || lowerQ.contains("women") || lowerQ.contains("girls");
+        boolean hasMale = lowerQ.contains("male") || lowerQ.contains("males") || lowerQ.contains("men") || lowerQ.contains("boys");
+
+        if (hasFemale && hasMale) {
+            gender = null;
+            understood = true;
+        } else if (hasFemale) {
             gender = "female";
             understood = true;
-        } else if (lowerQ.contains("male") || lowerQ.contains("males") || lowerQ.contains("men") || lowerQ.contains("boys")) {
+        } else if (hasMale) {
             gender = "male";
             understood = true;
         }
